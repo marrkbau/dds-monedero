@@ -13,4 +13,9 @@ public class Deposito extends Movimiento{
     return true;
   }
 
+  @Override
+  public double calcularValor(Cuenta cuenta) {
+    return cuenta.getSaldo() + getMonto();
+  }
+
 }
