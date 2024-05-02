@@ -51,6 +51,13 @@ public class Cuenta {
       throw new SaldoMenorException("No puede sacar mas de " + getSaldo() + " $");
     }
 
+    validarExtraccion(cuanto);
+
+    new Extraccion(LocalDate.now(), cuanto).agregateA(this);
+  }
+
+  public void validarExtraccion(double cuanto) {
+
     double montoExtraidoHoy = getMontoExtraidoA(LocalDate.now());
     double limite = 1000 - montoExtraidoHoy;
 
@@ -58,9 +65,7 @@ public class Cuenta {
       throw new MaximoExtraccionDiarioException("No puede extraer mas de $ " + 1000
           + " diarios, límite: " + limite);
     }
-    new Extraccion(LocalDate.now(), cuanto).agregateA(this);
   }
-
   public long getMovimientosDelDia() {
     return getMovimientos().stream().filter(movimiento -> movimiento.fueDepositado(LocalDate.now())).count();
   }
@@ -80,7 +85,7 @@ public class Cuenta {
 
   public double getMontoExtraidoA(LocalDate fecha) {
     return getMovimientos().stream()
-        .filter(movimiento -> !movimiento.isDeposito() && movimiento.getFecha().equals(fecha))
+        .filter(movimiento -> movimiento.fueExtraido(fecha))
         .mapToDouble(Movimiento::getMonto)
         .sum();
   }
